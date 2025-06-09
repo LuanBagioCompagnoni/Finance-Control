@@ -48,7 +48,7 @@ passport.use(new localStrategy({ usernameField: 'email' }, async function (email
     try {
         const user = await UserModel.findOne({email})
 
-        if (!user) return done(null, false, {message: 'Incorrect e-mail'})
+        if (!user) return done(null, false, { message: 'Incorrect e-mail' })
         console.log(password, user)
 
         const isMatch = await bcrypt.compare(password, user.password);
