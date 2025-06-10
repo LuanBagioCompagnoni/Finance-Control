@@ -10,15 +10,16 @@ export default class UserController {
         try {
             const body = req.body;
 
-            return this.userService.create(body).then((result) => {
-                if (result.sucess !== true) {
-                    res.status(400).json(result)
-                }
+            const result = await this.userService.create(body, req);
 
-                res.status(200).json(result)
-            })
+            if (result?.success !== true) {
+                return res.status(400).json(result)
+            }
+
+            return res.status(200).json(result)
         } catch (err) {
-            res.status(500).json({ sucess: false, message: 'Internal server error!', error: err})
+            console.log(err)
+            res.status(500).json({ success: false, message: 'Internal server error!', error: err})
         }
     }
 }
