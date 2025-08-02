@@ -72,7 +72,11 @@ passport.use(new localStrategy({ usernameField: 'email' }, async function (email
 
 routes(app);
 
-const PORT = process.env.PORT || 3000;
+if (!process.env.PORT) {
+    console.log('Process port not specified');
+    process.exit(1);
+}
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`)

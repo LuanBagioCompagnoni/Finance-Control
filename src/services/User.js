@@ -1,8 +1,8 @@
 import UserModel from '../models/user.js'
-import { hashPassword, generateSalt } from "../helpers/password.js";
+import {generateSalt, hashPassword} from "../helpers/password.js";
 
 export default class UserService {
-    async create(user, req) {
+    async create(user) {
         try {
             const salt = generateSalt()
 
@@ -15,26 +15,7 @@ export default class UserService {
                 }
             }
 
-            const newUser = await UserModel.insertOne(userInsertObject)
-
-            console.log(newUser);
-
-            return await new Promise((resolve, reject) => {
-                req.logIn(newUser, (err) => {
-                    if (err) {
-                        resolve({ success: false, error: err });
-                    } else {
-                        resolve({
-                            success: true,
-                            message: 'User created successfully!',
-                            user: {
-                                id: newUser._id,
-                                email: newUser.email
-                            }
-                        });
-                    }
-                });
-            });
+            return await UserModel.insertOne(userInsertObject);
         } catch (err) {
             console.log(err)
 

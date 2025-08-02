@@ -1,0 +1,26 @@
+services:
+  fc-services:
+    container_name: fc-control
+    command: npm run dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/fc-services/src
+      - ./app.js:/fc-services/app.js
+      - ./package.json:/fc-services/package.json
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_CONNECTION_STRING: ${MONGODB_CONNECTION_STRING}
+      SECRET: ${SECRET}
+      PORT: ${PORT}
+  fc-web:
+    container_name: fc-web
+    command: npm run dev
+    volumes:
+      - ./front-end:/fc-web
+    ports:
+      - "3000:3000"
+    build:
+      context: ./front-end
