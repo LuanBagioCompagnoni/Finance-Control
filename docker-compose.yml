@@ -1,6 +1,6 @@
 services:
   fc-services:
-    container_name: fc-control
+    container_name: fc-services
     command: npm run dev
     build:
       context: .

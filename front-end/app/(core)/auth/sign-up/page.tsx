@@ -16,7 +16,9 @@ function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordBlur, setPasswordBlur] = useState(true);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmPasswordBlur, setConfirmPasswordBlur] = useState(true);
   const [inputStatus, setInputStatus] = useState<'default' | 'error' | 'warning'>('default');
   const [passwordMessage, setPasswordMessage] = useState('');
   const [canSubmit, setCanSubmit] = useState(false);
@@ -44,7 +46,7 @@ function SignUp() {
   };
 
   useEffect(() => {
-    if (password && confirmPassword) {
+    if (password && confirmPassword && !passwordBlur && !confirmPasswordBlur) {
       if (password !== confirmPassword) {
         setInputStatus('error');
         setPasswordMessage('As senhas não coincidem');
@@ -59,7 +61,7 @@ function SignUp() {
       setPasswordMessage('');
       setCanSubmit(false);
     }
-  }, [password, confirmPassword, email, name]);
+  }, [password, confirmPassword, passwordBlur, confirmPasswordBlur, email, name]);
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -89,6 +91,8 @@ function SignUp() {
           type="password"
           status={inputStatus}
           onChange={(e) => setPassword(e.target.value)}
+          onBlur={() => setPasswordBlur(false)}
+          onFocus={() => setPasswordBlur(true)}
         />
         <Input
           label="Confirme sua senha"
@@ -97,6 +101,8 @@ function SignUp() {
           type="password"
           status={inputStatus}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          onBlur={() => setConfirmPasswordBlur(false)}
+          onFocus={() => setConfirmPasswordBlur(true)}
         />
         { passwordMessage && (
           <h1 className={`text-red-500 ${passwordMessage.length === 0 ? 'hidden' : ''}`}>{passwordMessage}</h1>

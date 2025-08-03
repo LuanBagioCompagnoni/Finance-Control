@@ -20,6 +20,8 @@ interface InputProps {
     isRequired?: boolean;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     label?: string;
+    onBlur?: () => void;
+    onFocus?: () => void;
 }
 
 const inputVariants = cva(
@@ -52,7 +54,7 @@ const textVariants = cva('', {
   }
 });
 
-function Input({ className, id, name, status, type, value, isRequired, onChange, label }: InputProps ) {
+function Input({ className, id, name, status, type, value, isRequired, onChange, label, onBlur, onFocus }: InputProps ) {
   const [text, setText] = useState(value ? String(value) : '');
   const [isFocused, setIsFocused] = useState(false);
   const [passwordIsVisible, setPasswordIsVisible] = useState(false);
@@ -60,10 +62,16 @@ function Input({ className, id, name, status, type, value, isRequired, onChange,
 
   const handleFocus = () => {
     setIsFocused(true);
+      if (onFocus) {
+          onFocus()
+      }
   }
 
-  const handleBlur = () => {
-    setIsFocused(false)
+  const handleBlur = (e: React.FocusEvent) => {
+    setIsFocused(false);
+    if (onBlur) {
+        onBlur()
+    }
   }
 
   const handleShowPassword = (e: React.MouseEvent<SVGSVGElement>) => {
