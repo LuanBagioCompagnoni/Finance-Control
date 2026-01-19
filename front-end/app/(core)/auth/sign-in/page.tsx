@@ -1,17 +1,17 @@
-"use client"
-import Image
-  from 'next/image';
+'use client'
+
+import Image from 'next/image';
 
 import { Button } from '@/shared/components/button';
 import Input from '@/shared/components/input';
 
-import AuthModeToggle
-  from '@/(core)/auth/components/authModeToggle';
+import AuthModeToggle from '@/(core)/auth/components/authModeToggle';
 import Form from '@/(core)/auth/components/form';
 import React, {useEffect, useState} from "react";
-import request from "@/shared/utils/request";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
+
+import request from '@/shared/utils/request';
 
 function SignIn() {
     const router = useRouter()
@@ -41,7 +41,7 @@ function SignIn() {
     };
 
     useEffect(() => {
-        if (!password && !email) {
+        if (!password || !email) {
             setCanSubmit(false);
         } else {
             setCanSubmit(true);
@@ -69,7 +69,7 @@ function SignIn() {
         onChange={(e) => setPassword(e.target.value)}
       />
       <Button placeholder="Entrar" disabled={!canSubmit}/>
-      <AuthModeToggle className="pt-8"/>
+      <AuthModeToggle className="pt-8" />
     </Form>
   );
 }

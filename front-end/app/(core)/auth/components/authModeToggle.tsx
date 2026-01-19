@@ -12,8 +12,8 @@ function AuthModeToggle({ className }: AuthModeToggleProps) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const signIn = { informative: 'Não tem uma conta?', action: 'Crie aqui' }
-  const signUp = { informative: 'Já tem uma conta?', action: 'Acesse aqui' }
+  const signIn = { text: 'Não tem uma conta?', action: 'Crie aqui' }
+  const signUp = { text: 'Já tem uma conta?', action: 'Acesse aqui' }
 
   const isActive = (path: string) => pathname.includes(path);
 
@@ -21,8 +21,8 @@ function AuthModeToggle({ className }: AuthModeToggleProps) {
   const destinationPage = isActive('/auth/sign-in') ? '/auth/sign-up' : '/auth/sign-in';
 
   return (
-    <div className={cn('flex space-x-2 text-gray-200', className)}>
-      <p>{currentText.informative}</p>
+    <div className={cn('flex-col text-gray-200 text-center', className)}>
+      <p>{currentText.text}</p>
       <a className="text-blue-500 cursor-pointer hover:text-blue-400" onClick={() => router.push(destinationPage)}><u><b>{currentText.action}</b></u></a>
     </div>
   );
