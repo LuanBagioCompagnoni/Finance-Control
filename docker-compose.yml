@@ -9,14 +9,13 @@ services:
     volumes:
       - ./src/web:/app
       - /app/node_modules
-      - /app/.next
     ports:
       - "3000:3000"
     command: npm run dev
     depends_on:
       - fc-core
     environment:
-      - NEXT_PUBLIC_API_URL=http://fc-core:5000
+      - NEXT_PUBLIC_API_URL=http://localhost:5000
 
   fc-core:
     container_name: fc-core
