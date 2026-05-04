@@ -1,33 +1,47 @@
+version: '3.8'
+
 services:
-  fc-services:
-    container_name: fc-services
-    command: npm run dev
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./src:/fc-services/src
-    ports:
-      - "5000:5000"
-    environment:
-      MONGODB_CONNECTION_STRING: ${MONGODB_CONNECTION_STRING}
-      SECRET: ${SECRET}
-      PORT: ${PORT}
   fc-web:
     container_name: fc-web
-    command: npm run dev
+    build:
+      context: ./src/web
+      dockerfile: Dockerfile
     volumes:
-      - ./front-end:/fc-web
+      - ./src/web:/app
+      - /app/node_modules
+      - /app/.next
     ports:
       - "3000:3000"
+    command: npm run dev
+    depends_on:
+      - fc-core
+    environment:
+      - NEXT_PUBLIC_API_URL=http://fc-core:5000
+
+  fc-core:
+    container_name: fc-core
     build:
-      context: front-end-bkp
+      context: ./src/core
+      dockerfile: Dockerfile
+    volumes:
+      - ./src/core:/app
+      - /app/node_modules
+    ports:
+      - "5000:5000"
+    command: npm run dev
+    depends_on:
+      - fc-mongo
+    environment:
+      - MONGODB_URI=mongodb://fc-mongo:27017/finance-control
+      - JWT_SECRET=${JWT_SECRET:-supersecretdev}
+      - PORT=5000
+      - NODE_ENV=development
+
   fc-mongo:
-    image: mongo:7.0
     container_name: fc-mongo
+    image: mongo:7.0
     ports:
       - "27017:27017"
     volumes:
       - ./.docker/fc-mongo/data:/data/db
-      - ./docker/fc-mongo/seed.js:/docker-entrypoint-initdb.d/seed.js
       - /etc/localtime:/etc/localtime:ro
