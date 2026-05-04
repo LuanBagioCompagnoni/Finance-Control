@@ -7,9 +7,9 @@
     "src/core"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w src/web\" \"npm run dev -w src/core\"",
     "dev:web": "npm run dev -w src/web",
-    "dev:core": "npm run dev -w src/core"
+    "dev:core": "npm run dev -w src/core",
+    "dev": "npm run dev:web"
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
