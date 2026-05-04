@@ -2,7 +2,7 @@ import { User, IUser } from '../models/User'
 import { hashPassword, comparePassword } from '../helpers/password'
 import { signToken } from '../helpers/jwt'
 import { CategoryService } from './CategoryService'
-import { Types } from 'mongoose'
+import mongoose, { Types } from 'mongoose'
 
 export class AuthService {
   static async register(name: string, email: string, password: string): Promise<{ user: IUser; token: string }> {
@@ -10,12 +10,21 @@ export class AuthService {
     if (existing) throw new Error('EMAIL_IN_USE')
 
     const passwordHash = await hashPassword(password)
-    const user = await User.create({ name, email, passwordHash })
 
-    await CategoryService.seedDefaultCategories(user._id as Types.ObjectId)
-
-    const token = signToken({ userId: String(user._id), email: user.email })
-    return { user, token }
+    const session = await mongoose.startSession()
+    session.startTransaction()
+    try {
+      const [user] = await User.create([{ name, email, passwordHash }], { session })
+      await CategoryService.seedDefaultCategories(user._id as Types.ObjectId, session)
+      await session.commitTransaction()
+      const token = signToken({ userId: String(user._id), email: user.email })
+      return { user, token }
+    } catch (err) {
+      await session.abortTransaction()
+      throw err
+    } finally {
+      session.endSession()
+    }
   }
 
   static async login(email: string, password: string): Promise<{ user: IUser; token: string }> {

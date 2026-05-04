@@ -14,5 +14,9 @@ export function signToken(payload: JwtPayload): string {
 }
 
 export function verifyToken(token: string): JwtPayload {
-  return jwt.verify(token, JWT_SECRET) as JwtPayload
+  const decoded = jwt.verify(token, JWT_SECRET)
+  if (typeof decoded !== 'object' || !decoded || !('userId' in decoded) || !('email' in decoded)) {
+    throw new Error('INVALID_TOKEN_SHAPE')
+  }
+  return decoded as JwtPayload
 }

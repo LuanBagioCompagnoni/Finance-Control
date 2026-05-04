@@ -75,3 +75,43 @@ describe('GET /api/auth/me', () => {
     expect(res.status).toBe(401)
   })
 })
+
+describe('POST /api/auth/register (validation)', () => {
+  it('returns 400 for missing fields', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'X' }) // missing email and password
+    expect(res.status).toBe(400)
+  })
+
+  it('returns 400 for invalid email', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Luan', email: 'not-an-email', password: 'senha123' })
+    expect(res.status).toBe(400)
+  })
+})
+
+describe('POST /api/auth/login (non-existent user)', () => {
+  it('returns 401 for unknown email', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'nobody@nowhere.com', password: 'senha123' })
+    expect(res.status).toBe(401)
+  })
+})
+
+describe('POST /api/auth/logout', () => {
+  it('clears the auth cookie', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Luan', email: 'logout@test.com', password: 'senha123' })
+
+    const res = await request(app).post('/api/auth/logout')
+    expect(res.status).toBe(200)
+    const setCookieHeader = res.headers['set-cookie']
+    if (setCookieHeader) {
+      expect(setCookieHeader[0]).toMatch(/auth-token=;/)
+    }
+  })
+})

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 import { AuthService } from '../services/AuthService'
 import { authenticate } from '../middleware/authenticate'
 import { COOKIE_NAME } from '../helpers/jwt'
@@ -33,6 +33,10 @@ router.post('/register', async (req, res, next) => {
       user: { id: user._id, name: user.name, email: user.email },
     })
   } catch (err) {
+    if (err instanceof ZodError) {
+      res.status(400).json({ error: 'Validation error', details: err.errors.map(e => ({ path: e.path.join('.'), message: e.message })) })
+      return
+    }
     if (err instanceof Error && err.message === 'EMAIL_IN_USE') {
       res.status(409).json({ error: 'Email already in use' })
       return
@@ -50,6 +54,10 @@ router.post('/login', async (req, res, next) => {
       user: { id: user._id, name: user.name, email: user.email },
     })
   } catch (err) {
+    if (err instanceof ZodError) {
+      res.status(400).json({ error: 'Validation error', details: err.errors.map(e => ({ path: e.path.join('.'), message: e.message })) })
+      return
+    }
     if (err instanceof Error && err.message === 'INVALID_CREDENTIALS') {
       res.status(401).json({ error: 'Invalid email or password' })
       return

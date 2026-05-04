@@ -1,5 +1,5 @@
-import { Category, ICategory } from '../models/Category'
-import { Types } from 'mongoose'
+import mongoose, { Types } from 'mongoose'
+import { Category, ICategory, CategoryType } from '../models/Category'
 
 const DEFAULT_CATEGORIES = [
   { name: 'Educação', type: 'EXPENSE' as const, costType: 'FIXED' as const, color: '#8b5cf6', icon: 'graduation-cap' },
@@ -17,13 +17,13 @@ const DEFAULT_CATEGORIES = [
 ]
 
 export class CategoryService {
-  static async seedDefaultCategories(userId: Types.ObjectId): Promise<void> {
+  static async seedDefaultCategories(userId: Types.ObjectId, session?: mongoose.ClientSession): Promise<void> {
     const categories = DEFAULT_CATEGORIES.map(c => ({ ...c, userId }))
-    await Category.insertMany(categories)
+    await Category.insertMany(categories, session ? { session } : {})
   }
 
-  static async findAll(userId: Types.ObjectId, type?: string): Promise<ICategory[]> {
-    const filter: { userId: Types.ObjectId; type?: string } = { userId }
+  static async findAll(userId: Types.ObjectId, type?: CategoryType): Promise<ICategory[]> {
+    const filter: { userId: Types.ObjectId; type?: CategoryType } = { userId }
     if (type) filter.type = type
     return Category.find(filter).sort({ type: 1, name: 1 })
   }
@@ -40,7 +40,12 @@ export class CategoryService {
   }
 
   static async update(userId: Types.ObjectId, id: string, data: Partial<{
-    name: string; type: string; costType: string; color: string; icon: string; monthlyLimit: number
+    name: string
+    type: 'INCOME' | 'EXPENSE' | 'INVESTMENT'
+    costType: 'FIXED' | 'VARIABLE'
+    color: string
+    icon: string
+    monthlyLimit: number
   }>): Promise<ICategory | null> {
     return Category.findOneAndUpdate({ _id: id, userId }, data, { new: true })
   }
