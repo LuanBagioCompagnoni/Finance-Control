@@ -9,7 +9,7 @@
   "scripts": {
     "dev:web": "npm run dev -w src/web",
     "dev:core": "npm run dev -w src/core",
-    "dev": "npm run dev:web"
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:core\""
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
