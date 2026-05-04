@@ -1,37 +1,17 @@
 {
-  "name": "finance-control-services",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "app.js",
+  "name": "finance-control",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "src/web",
+    "src/core"
+  ],
   "scripts": {
-    "dev": "nodemon app.js",
-    "test": "vitest --passWithNoTests"
-  },
-  "jest": {
-    "testEnvironment": "node"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "express-handlebars": "^8.0.1",
-    "express-session": "^1.18.1",
-    "mongoose": "^8.15.1",
-    "passport": "^0.7.0",
-    "passport-local": "^1.0.0"
+    "dev": "concurrently \"npm run dev -w src/web\" \"npm run dev -w src/core\"",
+    "dev:web": "npm run dev -w src/web",
+    "dev:core": "npm run dev -w src/core"
   },
   "devDependencies": {
-    "@eslint/js": "^9.32.0",
-    "eslint": "^9.32.0",
-    "globals": "^16.3.0",
-    "jest": "^30.0.5",
-    "nodemon": "^3.1.10",
-    "typescript-eslint": "^8.38.0",
-    "vitest": "^3.2.4"
+    "concurrently": "^9.0.0"
   }
 }

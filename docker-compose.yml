@@ -7,8 +7,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./src:/fc-services/src
-      - ./app.js:/fc-services/app.js
-      - ./package.json:/fc-services/package.json
     ports:
       - "5000:5000"
     environment:
@@ -23,4 +21,13 @@ services:
     ports:
       - "3000:3000"
     build:
-      context: ./front-end
+      context: front-end-bkp
+  fc-mongo:
+    image: mongo:7.0
+    container_name: fc-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./.docker/fc-mongo/data:/data/db
+      - ./docker/fc-mongo/seed.js:/docker-entrypoint-initdb.d/seed.js
+      - /etc/localtime:/etc/localtime:ro

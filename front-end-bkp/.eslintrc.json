@@ -1,0 +1,87 @@
+{
+  "extends": "next/core-web-vitals",
+  "plugins": ["react", "simple-import-sort"],
+  "rules": {
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "no-unused-vars": ["error", {
+      "args": "none"
+    }],
+    "quotes": ["error", "single"],
+    "react/jsx-quotes": "off",
+    "jsx-quotes": ["error", "prefer-double"],
+    "react/jsx-curly-brace-presence": [
+      "error",
+      {
+        "props": "never",
+        "children": "never"
+      }
+    ],
+    "indent": ["error", 2]
+  },
+  "overrides": [
+    // override "simple-import-sort" config
+    {
+      "files": ["*.js", "*.jsx", "*.ts", "*.tsx"],
+      "rules": {
+        "import/prefer-default-export": "off",
+        "react-hooks/rules-of-hooks": "off",
+        "simple-import-sort/imports": [
+          "error",
+          {
+            "groups": [
+              // Packages `react` related packages come first.
+              ["^react", "^@?\\w"],
+              // Side effect imports.
+              ["^\\u0000"],
+              // Shared components
+              ["^@/.*shared/components"],
+              // Internal components
+              ["^@/.*components"],
+              // Contexts
+              ["^@/.*contexts"],
+              // Hooks
+              ["^@/.*hooks"],
+              // Icons
+              ["^@/.*icons"],
+              // Utils
+              ["^@/.*utils"],
+              // Types
+              ["^@/.*types"],
+              // Constants
+              ["^@/.*constants"],
+              // Parent imports. Put `..` last.
+              ["^\\.\\.(?!/?$)"],
+              ["^\\.\\./?$"],
+              // Other relative imports. Put same-folder imports and `.` last.
+              ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+              // Style imports.
+              ["^.+\\.?(css)$"]
+            ]
+          }
+        ],
+        "max-len": [
+          "warn",
+          {
+            "code": 160,
+            "ignoreUrls": true,
+            "ignoreStrings": true,
+            "ignoreTemplateLiterals": true,
+            "ignoreRegExpLiterals": true
+          }
+        ]
+      }
+    }
+  ]
+}
