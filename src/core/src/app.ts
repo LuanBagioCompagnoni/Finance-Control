@@ -25,6 +25,8 @@ async function start() {
   app.listen(port, () => console.log(`Core API running on :${port}`))
 }
 
-start().catch(console.error)
+if (process.env.NODE_ENV !== 'test') {
+  start().catch(console.error)
+}
 
 export { app }
