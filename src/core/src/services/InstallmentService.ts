@@ -88,8 +88,8 @@ export class InstallmentService {
 
       // Restore the balance: reverse the total amount debited when group was created
       const totalDebited = group.installmentAmount * group.installmentCount
-      await Account.findByIdAndUpdate(
-        group.creditCardAccountId,
+      await Account.findOneAndUpdate(
+        { _id: group.creditCardAccountId, userId },
         { $inc: { balance: totalDebited } },
         { session }
       )

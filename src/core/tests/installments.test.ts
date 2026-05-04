@@ -95,6 +95,21 @@ describe('POST /api/installments', () => {
       })
     expect(res.status).toBe(400)
   })
+
+  it('returns 404 for non-existent account', async () => {
+    const res = await request(app)
+      .post('/api/installments')
+      .set('Cookie', cookie)
+      .send({
+        creditCardAccountId: '000000000000000000000001',
+        categoryId,
+        description: 'Test',
+        totalAmount: 600,
+        installmentCount: 3,
+        startDate: '2026-01-01',
+      })
+    expect(res.status).toBe(404)
+  })
 })
 
 describe('GET /api/installments', () => {
