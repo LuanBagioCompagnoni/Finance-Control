@@ -71,3 +71,39 @@ describe('DELETE /api/categories/:id', () => {
     expect(res.status).toBe(200)
   })
 })
+
+describe('PUT /api/categories/:id (not found)', () => {
+  it('returns 404 for non-existent category', async () => {
+    const res = await request(app)
+      .put('/api/categories/000000000000000000000001')
+      .set('Cookie', cookie)
+      .send({ name: 'Ghost' })
+    expect(res.status).toBe(404)
+  })
+})
+
+describe('DELETE /api/categories/:id (not found)', () => {
+  it('returns 404 for non-existent category', async () => {
+    const res = await request(app)
+      .delete('/api/categories/000000000000000000000001')
+      .set('Cookie', cookie)
+    expect(res.status).toBe(404)
+  })
+})
+
+describe('POST /api/categories (validation)', () => {
+  it('returns 400 for missing required fields', async () => {
+    const res = await request(app)
+      .post('/api/categories')
+      .set('Cookie', cookie)
+      .send({ name: 'Bad' }) // missing type and costType
+    expect(res.status).toBe(400)
+  })
+})
+
+describe('GET /api/categories (unauthenticated)', () => {
+  it('returns 401 without cookie', async () => {
+    const res = await request(app).get('/api/categories')
+    expect(res.status).toBe(401)
+  })
+})

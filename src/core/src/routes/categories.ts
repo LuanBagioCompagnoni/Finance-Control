@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { z, ZodError } from 'zod'
 import { authenticate } from '../middleware/authenticate'
 import { CategoryService } from '../services/CategoryService'
+import { CategoryType } from '../models/Category'
 import { Types } from 'mongoose'
 
 const router = Router()
@@ -20,8 +21,12 @@ const updateSchema = createSchema.partial()
 
 router.get('/', async (req, res, next) => {
   try {
-    const type = req.query.type as string | undefined
-    const categories = await CategoryService.findAll(new Types.ObjectId(req.user!.userId), type as any)
+    const VALID_TYPES: CategoryType[] = ['INCOME', 'EXPENSE', 'INVESTMENT']
+    const rawType = req.query.type as string | undefined
+    const type: CategoryType | undefined = VALID_TYPES.includes(rawType as CategoryType)
+      ? (rawType as CategoryType)
+      : undefined
+    const categories = await CategoryService.findAll(new Types.ObjectId(req.user!.userId), type)
     res.json(categories)
   } catch (err) { next(err) }
 })
