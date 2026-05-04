@@ -15,6 +15,10 @@ const createSchema = z.object({
   type: z.enum(['INCOME', 'EXPENSE', 'TRANSFER', 'INVESTMENT']),
   description: z.string().min(1),
   toAccountId: z.string().optional(),
+}).superRefine((val, ctx) => {
+  if (val.type === 'TRANSFER' && !val.toAccountId) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['toAccountId'], message: 'toAccountId is required for TRANSFER' })
+  }
 })
 
 router.get('/', async (req, res, next) => {
@@ -43,12 +47,20 @@ router.post('/', async (req, res, next) => {
       res.status(400).json({ error: 'Validation error', details: err.errors.map(e => ({ path: e.path.join('.'), message: e.message })) })
       return
     }
+    if (err instanceof Error && err.message === 'ACCOUNT_NOT_FOUND') {
+      res.status(404).json({ error: 'Account not found' })
+      return
+    }
     next(err)
   }
 })
 
 router.delete('/:id', async (req, res, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      res.status(404).json({ error: 'Transaction not found' })
+      return
+    }
     const ok = await TransactionService.delete(new Types.ObjectId(req.user!.userId), req.params.id)
     if (!ok) { res.status(404).json({ error: 'Transaction not found' }); return }
     res.json({ message: 'Deleted' })

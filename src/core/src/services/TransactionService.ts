@@ -27,12 +27,32 @@ export class TransactionService {
       }], { session })
 
       if (data.type === 'EXPENSE' || data.type === 'INVESTMENT') {
-        await Account.findByIdAndUpdate(data.accountId, { $inc: { balance: -data.amount } }, { session })
+        const updated = await Account.findOneAndUpdate(
+          { _id: data.accountId, userId },
+          { $inc: { balance: -data.amount } },
+          { session }
+        )
+        if (!updated) throw new Error('ACCOUNT_NOT_FOUND')
       } else if (data.type === 'INCOME') {
-        await Account.findByIdAndUpdate(data.accountId, { $inc: { balance: data.amount } }, { session })
+        const updated = await Account.findOneAndUpdate(
+          { _id: data.accountId, userId },
+          { $inc: { balance: data.amount } },
+          { session }
+        )
+        if (!updated) throw new Error('ACCOUNT_NOT_FOUND')
       } else if (data.type === 'TRANSFER' && data.toAccountId) {
-        await Account.findByIdAndUpdate(data.accountId, { $inc: { balance: -data.amount } }, { session })
-        await Account.findByIdAndUpdate(data.toAccountId, { $inc: { balance: data.amount } }, { session })
+        const from = await Account.findOneAndUpdate(
+          { _id: data.accountId, userId },
+          { $inc: { balance: -data.amount } },
+          { session }
+        )
+        if (!from) throw new Error('ACCOUNT_NOT_FOUND')
+        const to = await Account.findOneAndUpdate(
+          { _id: data.toAccountId, userId },
+          { $inc: { balance: data.amount } },
+          { session }
+        )
+        if (!to) throw new Error('ACCOUNT_NOT_FOUND')
       }
 
       await session.commitTransaction()
@@ -50,7 +70,7 @@ export class TransactionService {
     session.startTransaction()
 
     try {
-      const tx = await Transaction.findOne({ _id: id, userId })
+      const tx = await Transaction.findOne({ _id: id, userId }, null, { session })
       if (!tx) { await session.abortTransaction(); return false }
 
       if (tx.type === 'EXPENSE' || tx.type === 'INVESTMENT') {
