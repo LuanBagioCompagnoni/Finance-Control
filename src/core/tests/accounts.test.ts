@@ -53,6 +53,8 @@ describe('PUT /api/accounts/:id', () => {
 
     expect(res.status).toBe(200)
     expect(res.body.name).toBe('Sicoob CC')
+    expect(res.body.bank).toBe('Sicoob')
+    expect(res.body.balance).toBe(0)
   })
 })
 

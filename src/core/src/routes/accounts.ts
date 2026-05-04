@@ -1,6 +1,5 @@
 import { Router } from 'express'
-import { z } from 'zod'
-import { ZodError } from 'zod'
+import { z, ZodError } from 'zod'
 import { authenticate } from '../middleware/authenticate'
 import { AccountService } from '../services/AccountService'
 import { Types } from 'mongoose'
@@ -61,7 +60,11 @@ router.put('/:id', async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
   try {
     const result = await AccountService.delete(new Types.ObjectId(req.user!.userId), req.params.id)
-    if (!result.ok) { res.status(409).json({ error: result.error }); return }
+    if (!result.ok) {
+      const status = result.error === 'Account not found' ? 404 : 409
+      res.status(status).json({ error: result.error })
+      return
+    }
     res.json({ message: 'Deleted' })
   } catch (err) { next(err) }
 })

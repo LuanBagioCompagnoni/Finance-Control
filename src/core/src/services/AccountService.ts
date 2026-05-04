@@ -26,6 +26,8 @@ export class AccountService {
   }
 
   static async delete(userId: Types.ObjectId, id: string): Promise<{ ok: boolean; error?: string }> {
+    const account = await Account.findOne({ _id: id, userId })
+    if (!account) return { ok: false, error: 'Account not found' }
     const txCount = await Transaction.countDocuments({ $or: [{ accountId: id }, { toAccountId: id }] })
     if (txCount > 0) return { ok: false, error: 'Account has transactions' }
     await Account.findOneAndDelete({ _id: id, userId })
