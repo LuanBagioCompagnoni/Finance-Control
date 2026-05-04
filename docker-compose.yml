@@ -29,9 +29,10 @@ services:
       - "5000:5000"
     command: npm run dev
     depends_on:
-      - fc-mongo
+      fc-mongo:
+        condition: service_healthy
     environment:
-      - MONGODB_URI=mongodb://fc-mongo:27017/finance-control
+      - MONGODB_URI=mongodb://fc-mongo:27017/finance-control?replicaSet=rs0
       - JWT_SECRET=${JWT_SECRET:-supersecretdev}
       - PORT=5000
       - NODE_ENV=development
@@ -39,8 +40,17 @@ services:
   fc-mongo:
     container_name: fc-mongo
     image: mongo:7.0
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
       - ./.docker/fc-mongo/data:/data/db
       - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: >-
+        mongosh --quiet --eval
+        "try{rs.status().ok}catch(e){rs.initiate({_id:'rs0',members:[{_id:0,host:'fc-mongo:27017'}]}).ok}"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
