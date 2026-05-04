@@ -33,6 +33,10 @@ router.post('/', async (req, res, next) => {
       res.status(400).json({ error: 'Validation error', details: err.errors.map(e => ({ path: e.path.join('.'), message: e.message })) })
       return
     }
+    if (err instanceof Error && err.message === 'ACCOUNT_NOT_FOUND') {
+      res.status(404).json({ error: 'Account not found' })
+      return
+    }
     next(err)
   }
 })
